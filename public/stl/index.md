@@ -256,34 +256,11 @@ map初始化
 
 - 使用初始化列表：
 
-```cpp
-#include <map>
-
-int main() {
-    std::map<int, std::string> myMap = {{1, "one"}, {2, "two"}, {3, "three"}};
-    // 或者可以使用花括号初始化列表的简化语法
-    // std::map<int, std::string> myMap{{1, "one"}, {2, "two"}, {3, "three"}};
-
-    // 使用 myMap 进行操作...
-
-    return 0;
-}
-```
+![image-20231101100755411](https://jiejiesks.oss-cn-beijing.aliyuncs.com/Note/202311011007188.png)
 
 - 使用迭代器范围初始化：
 
-```cpp
-#include <map>
-
-int main() {
-    std::map<int, std::string> sourceMap = {{1, "one"}, {2, "two"}, {3, "three"}};
-    std::map<int, std::string> myMap(sourceMap.begin(), sourceMap.end());
-
-    // 使用 myMap 进行操作...
-
-    return 0;
-}
-```
+![image-20231101100731164](https://jiejiesks.oss-cn-beijing.aliyuncs.com/Note/202311011007253.png)
 
 - 使用插入操作：
 
@@ -490,25 +467,7 @@ int main() {
 
 对于 `std::unordered_map` 容器，`myMap.begin()` 返回的是一个迭代器，指向容器中第一个键值对的位置。通过解引用迭代器，可以获取该位置上的键值对。
 
-```c++
-#include <iostream>
-#include <unordered_map>
-
-int main() {
-    std::unordered_map<int, std::string> myMap = {
-        {1, "apple"},
-        {2, "banana"},
-        {3, "orange"}
-    };
-
-    // 使用迭代器遍历容器
-    for (auto it = myMap.begin(); it != myMap.end(); ++it) {
-        std::cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
-    }
-
-    return 0;
-}
-```
+![image-20231101100822192](https://jiejiesks.oss-cn-beijing.aliyuncs.com/Note/202311011008487.png)
 
 遍历vector容器，通过`* ` 解引用
 
