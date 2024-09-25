@@ -2,7 +2,7 @@
 title = 'STL'
 date = 2023-11-01T10:08:43+08:00
 draft = false
-categories = ["c++"]
+categories = ["面试"]
 keywords = ["STL"]
 
 +++

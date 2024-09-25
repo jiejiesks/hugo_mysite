@@ -2,7 +2,7 @@
 title = 'OS'
 date = 2024-09-24T12:52:42+08:00
 draft = false
-categories = ["C++"]
+categories = ["面试"]
 keywords = [""]
 
 +++
