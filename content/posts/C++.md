@@ -1,8 +1,8 @@
 +++
 title = 'C++'
-date = 2024-09-23T21:07:32+08:00
+date = 2024-09-25T15:16:48+08:00
 draft = false
-categories = ["C++"]
+categories = ["面试"]
 keywords = [""]
 
 +++
@@ -231,13 +231,45 @@ char s2[] = "hello"
 
 3. 自增，由于s1是指针，可以通过自增移动指针，而s2数组名是地址常量，不能自增
 
-4. ```
+4. ```c++
    char *fun()
    {
    	char *s1 = "hello";
    	char s2[] = "hello"
    	可以return s1,不能return s2，因为s1在静态存储区，生命周期直到程序结束，而s2是一个局部变量
    }
+   
+   #include <bits/stdc++.h>
+   
+   using namespace std;
+   
+   char* mymalloc1()
+   {
+       char p[] = "abcd";
+       return p;
+   }
+   
+   char* mymalloc2()
+   {
+       char *p = "abcd";
+       return p;
+   }
+   
+   int main(void) {
+       char* a = nullptr;
+       char* b = nullptr;
+       a = mymalloc1();
+       b = mymalloc2();
+       printf("%s", a);
+       cout << endl;
+       printf("%s", b);
+       return 0;
+   }
+   
+   /*
+   (null)
+   abcd
+   */
    ```
 
 ## 四种强制类型转换
@@ -4328,6 +4360,82 @@ int main() {
 
     return 0;
 }
+```
+
+## unordered_map底层原理
+
+![img](https://jiejiesks.oss-cn-beijing.aliyuncs.com/Note/202409242021309.png)
+
+hashtable通过key能快速的找到value，使用拉链法解决hash冲突。具体而言，其维护一个buckets vector，通过hash(key)  % bucket count，得到key应该放在哪个桶里面。如果发生hash冲突，那么就通过拉链法将冲突的key维护在该bucket桶的链表中。后续查找操作，通过key找到属于哪个对应的桶，依次遍历链表找到对应的key，获得value。
+
+hashtable在设计bucket的数量上，维护了28个质数（因为质数发生哈希冲突的概率很低），在创建hashtable的时候，会根据元素数量选择对应的长度。
+
+为了解决hash退化为链表，维护负载因子(load_factor和最大负载因子（max_load_factor），如果负载因子大于最大负载因子时，就会进行扩容。
+
+扩容细节：
+
+1. 选择**下一个更大的质数**，创建bucket vector。
+2. **分配新的内存空间**：`hash_map`会分配一块新的内存空间，其大小等于新的容量。这块新的内存空间将用于存储`hash_map`中的元素。
+3. **重新哈希**（rehashing）：`hash_map`会遍历其所有的元素，根据新的容量来重新计算每个元素对应桶的位置。（哈希函数通常不变，根据取模即bucket count的值改变插入的位置）
+4. **释放旧的内存空间**：一旦所有的元素都被成功地插入到新的内存空间中，`hash_map`就会释放旧的内存空间（buckets数组），以防止内存泄漏。
+5. **更新容量**：最后，`hash_map`会更新其容量，以反映新的内存空间的大小。
+
+![image-20240924204430856](https://jiejiesks.oss-cn-beijing.aliyuncs.com/Note/202409242044240.png)
+
+重建的过程如图所示，根据头插法找到新的buckets桶的位置插入，并非直接复制，而是改变指针
+
+**如果扩容时发生插入或者查询操作怎么办？**
+
+**插入**：直接插入新的hashtable中
+
+**查询**：先查原来的hashtable，如果存在直接返回；如果不存在，等待扩容后，查询新表（可能扩容期间插入了新元素）
+
+**并发安全**：hashtable并不是并发安全的，可以考虑给每个bucket加读写锁
+
+在C++中，将类放入unordered_map
+
+1. 需要提供一个哈希函数，这可以通过特化 `std::hash<T>` 结构体或提供一个自定义函数来完成。
+2. 需要重载`==`，用于判断两个键是否相等
+
+```c++
+#include <set>
+#include <unordered_set>
+#include <functional>
+
+class MyClass {
+public:
+    int value;
+
+    MyClass(int val) : value(val) {}
+
+    // 重载<运算符，用于std::set
+    bool operator<(const MyClass& other) const {
+        return value < other.value;
+    }
+
+    // 重载==运算符，用于std::unordered_set
+    bool operator==(const MyClass& other) const {
+        return value == other.value;
+    }
+};
+
+// 提供 std::hash 特化，用于std::unordered_set
+namespace std {
+template <>
+struct hash<MyClass> {
+    std::size_t operator()(const MyClass& obj) const {
+        return std::hash<int>()(obj.value);
+    }
+};
+}
+
+int main() {
+    std::set<MyClass> mySet; // 使用<进行比较
+    std::unordered_set<MyClass> myUnorderedSet; // 使用hash和==进行比较
+
+    // ...
+}
+
 ```
 
 ## unordered_map和map的区别
